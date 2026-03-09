@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "前列腺癌随访助手",
+    "slug": "proca-followup",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0D7C66"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.proca.followup"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0D7C66",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.proca.followup"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-sharing"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3e72e05b-fbce-422b-98b2-7a01e276c7c2"
+      }
+    }
+  }
+}
