@@ -1,4 +1,4 @@
-// 内分泌治疗（注射）跟踪页面
+// 诊疗记录页面
 import React, { useState, useCallback } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal,
@@ -9,6 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Colors, Radius, Shadows } from '../theme';
 import { getInjectionRecords, addInjectionRecord, deleteInjectionRecord } from '../database';
 import { formatDateCN, getToday, daysFromNow } from '../utils/dateUtils';
+import DatePickerInput from '../components/DatePickerInput';
 
 const DRUG_PRESETS = ['亮丙瑞林', '戈舍瑞林', '曲普瑞林', '地加瑞克', '其他'];
 const DOSAGE_TYPES = ['1月', '3月', '6月'];
@@ -63,8 +64,8 @@ export default function InjectionScreen({ userId }) {
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <Text style={styles.pageTitle}>内分泌治疗跟踪</Text>
-                <Text style={styles.pageSubtitle}>注射计划管理与提醒</Text>
+                <Text style={styles.pageTitle}>诊疗记录</Text>
+                <Text style={styles.pageSubtitle}>内分泌治疗与注射管理</Text>
 
                 {/* 下次注射提醒卡片 */}
                 {latestRecord && (
@@ -95,12 +96,12 @@ export default function InjectionScreen({ userId }) {
                 )}
 
                 {/* 注射记录列表 */}
-                <Text style={styles.sectionTitle}>注射记录</Text>
+                <Text style={styles.sectionTitle}>诊疗记录</Text>
                 {records.length === 0 ? (
                     <View style={styles.emptyState}>
                         <Ionicons name="medical-outline" size={56} color={Colors.textTertiary} />
-                        <Text style={styles.emptyText}>暂无注射记录</Text>
-                        <Text style={styles.emptyHint}>点击右下角按钮添加注射记录</Text>
+                        <Text style={styles.emptyText}>暂无诊疗记录</Text>
+                        <Text style={styles.emptyHint}>点击右下角按钮添加诊疗记录</Text>
                     </View>
                 ) : (
                     records.map((record, index) => (
@@ -150,7 +151,7 @@ export default function InjectionScreen({ userId }) {
                         <View style={styles.modalSpacer} />
                         <View style={styles.modalContent}>
                             <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>添加注射记录</Text>
+                                <Text style={styles.modalTitle}>添加诊疗记录</Text>
                                 <TouchableOpacity onPress={() => setShowModal(false)}>
                                     <Ionicons name="close" size={24} color={Colors.textSecondary} />
                                 </TouchableOpacity>
@@ -188,13 +189,12 @@ export default function InjectionScreen({ userId }) {
                                 </View>
                             </View>
 
-                            <View style={styles.inputGroup}>
-                                <Text style={styles.inputLabel}>注射日期 *</Text>
-                                <TextInput style={styles.input} placeholder="YYYY-MM-DD"
-                                    placeholderTextColor={Colors.textTertiary}
-                                    value={injectionDate} onChangeText={setInjectionDate}
-                                />
-                            </View>
+                            <DatePickerInput
+                                label="注射日期"
+                                value={injectionDate}
+                                onChange={setInjectionDate}
+                                required
+                            />
 
                             <View style={styles.inputGroup}>
                                 <Text style={styles.inputLabel}>注射地点</Text>

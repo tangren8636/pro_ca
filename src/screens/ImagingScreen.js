@@ -2,13 +2,16 @@
 import React, { useState, useCallback } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal,
-    TextInput, Alert, Platform,
+    TextInput, Alert, Platform, Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
 import { Colors, Radius, Shadows } from '../theme';
 import { getImagingRecords, addImagingRecord, deleteImagingRecord } from '../database';
-import { formatDateCN, getToday, daysFromNow } from '../utils/dateUtils';
+import { formatDateCN, getToday } from '../utils/dateUtils';
+import DatePickerInput from '../components/DatePickerInput';
 
 const EXAM_TYPES = ['骨扫描', 'CT', 'MRI', 'PET-CT', '其他'];
 const CONCLUSION_PRESETS = [
@@ -28,6 +31,7 @@ export default function ImagingScreen({ userId }) {
     const [examDate, setExamDate] = useState(getToday());
     const [institution, setInstitution] = useState('');
     const [notes, setNotes] = useState('');
+    const [pdfFile, setPdfFile] = useState(null);
 
     const loadRecords = async () => {
         try {
@@ -40,15 +44,39 @@ export default function ImagingScreen({ userId }) {
 
     useFocusEffect(useCallback(() => { loadRecords(); }, [userId]));
 
+    const pickPdf = async () => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: 'application/pdf',
+                copyToCacheDirectory: true,
+            });
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const file = result.assets[0];
+                // 复制到应用的文档目录以持久化
+                const destDir = FileSystem.documentDirectory + 'imaging_pdfs/';
+                const dirInfo = await FileSystem.getInfoAsync(destDir);
+                if (!dirInfo.exists) {
+                    await FileSystem.makeDirectoryAsync(destDir, { intermediates: true });
+                }
+                const destPath = destDir + Date.now() + '_' + file.name;
+                await FileSystem.copyAsync({ from: file.uri, to: destPath });
+                setPdfFile({ name: file.name, uri: destPath });
+            }
+        } catch (error) {
+            Alert.alert('错误', '选择文件失败');
+        }
+    };
+
     const handleAdd = async () => {
         if (!conclusion.trim()) {
             Alert.alert('提示', '请填写检查结论');
             return;
         }
         try {
-            await addImagingRecord(userId, examType, conclusion.trim(), examDate, institution, '', notes);
+            const pdfUri = pdfFile ? pdfFile.uri : '';
+            await addImagingRecord(userId, examType, conclusion.trim(), examDate, institution, pdfUri, notes);
             setConclusion(''); setInstitution(''); setNotes('');
-            setExamDate(getToday()); setExamType('骨扫描');
+            setExamDate(getToday()); setExamType('骨扫描'); setPdfFile(null);
             setShowModal(false);
             loadRecords();
         } catch (error) {
@@ -66,6 +94,27 @@ export default function ImagingScreen({ userId }) {
                 }
             },
         ]);
+    };
+
+    const openPdf = async (uri) => {
+        try {
+            if (uri) {
+                const fileInfo = await FileSystem.getInfoAsync(uri);
+                if (fileInfo.exists) {
+                    // 使用 expo-sharing 来打开 PDF
+                    const Sharing = require('expo-sharing');
+                    if (await Sharing.isAvailableAsync()) {
+                        await Sharing.shareAsync(uri, { mimeType: 'application/pdf' });
+                    } else {
+                        Alert.alert('提示', '当前设备不支持文件打开');
+                    }
+                } else {
+                    Alert.alert('提示', 'PDF 文件不存在');
+                }
+            }
+        } catch (error) {
+            Alert.alert('错误', '打开文件失败');
+        }
     };
 
     const getTypeIcon = (type) => {
@@ -141,6 +190,16 @@ export default function ImagingScreen({ userId }) {
                                             <Text style={styles.metaText}>{record.notes}</Text>
                                         </View>
                                     ) : null}
+                                    {record.image_uri ? (
+                                        <TouchableOpacity
+                                            style={styles.pdfBadge}
+                                            onPress={() => openPdf(record.image_uri)}
+                                            activeOpacity={0.7}
+                                        >
+                                            <Ionicons name="document-attach" size={14} color={Colors.moduleImaging} />
+                                            <Text style={styles.pdfBadgeText}>查看 PDF 附件</Text>
+                                        </TouchableOpacity>
+                                    ) : null}
                                 </View>
                             </TouchableOpacity>
                         ))}
@@ -201,12 +260,31 @@ export default function ImagingScreen({ userId }) {
                                 />
                             </View>
 
+                            <DatePickerInput
+                                label="检查日期"
+                                value={examDate}
+                                onChange={setExamDate}
+                                required
+                            />
+
+                            {/* PDF 附件上传 */}
                             <View style={styles.inputGroup}>
-                                <Text style={styles.inputLabel}>检查日期 *</Text>
-                                <TextInput style={styles.input} placeholder="YYYY-MM-DD"
-                                    placeholderTextColor={Colors.textTertiary}
-                                    value={examDate} onChangeText={setExamDate}
-                                />
+                                <Text style={styles.inputLabel}>PDF 报告附件</Text>
+                                <TouchableOpacity style={styles.uploadButton} onPress={pickPdf} activeOpacity={0.7}>
+                                    <Ionicons
+                                        name={pdfFile ? "document-attach" : "cloud-upload-outline"}
+                                        size={22}
+                                        color={pdfFile ? Colors.success : Colors.moduleImaging}
+                                    />
+                                    <Text style={[styles.uploadButtonText, pdfFile && { color: Colors.success }]}>
+                                        {pdfFile ? pdfFile.name : '点击上传 PDF 报告'}
+                                    </Text>
+                                    {pdfFile && (
+                                        <TouchableOpacity onPress={() => setPdfFile(null)}>
+                                            <Ionicons name="close-circle" size={20} color={Colors.textTertiary} />
+                                        </TouchableOpacity>
+                                    )}
+                                </TouchableOpacity>
                             </View>
 
                             <View style={styles.inputGroup}>
@@ -267,6 +345,12 @@ const styles = StyleSheet.create({
     conclusionText: { fontSize: 15, fontWeight: '500', color: Colors.textPrimary, lineHeight: 22, marginBottom: 8 },
     metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
     metaText: { fontSize: 12, color: Colors.textTertiary },
+    pdfBadge: {
+        flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8,
+        paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12,
+        backgroundColor: Colors.moduleImaging + '10', alignSelf: 'flex-start',
+    },
+    pdfBadgeText: { fontSize: 12, fontWeight: '600', color: Colors.moduleImaging },
     fab: {
         position: 'absolute', right: 20, bottom: 24, width: 56, height: 56,
         borderRadius: 28, backgroundColor: Colors.moduleImaging,
@@ -303,6 +387,13 @@ const styles = StyleSheet.create({
     presetBtnActive: { borderColor: Colors.moduleImaging, backgroundColor: Colors.moduleImaging + '10' },
     presetBtnText: { fontSize: 12, color: Colors.textSecondary },
     presetBtnTextActive: { color: Colors.moduleImaging, fontWeight: '600' },
+    uploadButton: {
+        flexDirection: 'row', alignItems: 'center', gap: 10,
+        backgroundColor: Colors.background, borderWidth: 1.5, borderColor: Colors.border,
+        borderRadius: Radius.md, paddingHorizontal: 16, paddingVertical: 14,
+        borderStyle: 'dashed',
+    },
+    uploadButtonText: { flex: 1, fontSize: 14, color: Colors.textSecondary },
     saveButton: {
         backgroundColor: Colors.moduleImaging, borderRadius: Radius.md, height: 50,
         alignItems: 'center', justifyContent: 'center', marginTop: 6, ...Shadows.medium,

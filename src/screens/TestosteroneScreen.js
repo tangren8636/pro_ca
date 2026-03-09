@@ -10,6 +10,7 @@ import { LineChart } from 'react-native-chart-kit';
 import { Colors, Radius, Shadows } from '../theme';
 import { getTestosteroneRecords, addTestosteroneRecord, deleteTestosteroneRecord, getPsaRecords, checkCastrationResistance } from '../database';
 import { formatDateCN, formatDateShort, getToday } from '../utils/dateUtils';
+import DatePickerInput from '../components/DatePickerInput';
 
 const screenWidth = Dimensions.get('window').width;
 const CASTRATION_THRESHOLD_NGDL = 50;
@@ -239,14 +240,12 @@ export default function TestosteroneScreen({ userId }) {
                             </View>
                         </View>
 
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>检测日期 *</Text>
-                            <TextInput
-                                style={styles.input} placeholder="YYYY-MM-DD"
-                                placeholderTextColor={Colors.textTertiary}
-                                value={testDate} onChangeText={setTestDate}
-                            />
-                        </View>
+                        <DatePickerInput
+                            label="检测日期"
+                            value={testDate}
+                            onChange={setTestDate}
+                            required
+                        />
 
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>检测机构</Text>

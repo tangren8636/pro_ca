@@ -10,6 +10,7 @@ import { LineChart } from 'react-native-chart-kit';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '../theme';
 import { getPsaRecords, addPsaRecord, deletePsaRecord, calculatePSADT, checkBiochemicalRecurrence } from '../database';
 import { formatDateCN, formatDateShort, getToday } from '../utils/dateUtils';
+import DatePickerInput from '../components/DatePickerInput';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -247,16 +248,12 @@ export default function PsaScreen({ userId }) {
                             />
                         </View>
 
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>检测日期 *</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="YYYY-MM-DD"
-                                placeholderTextColor={Colors.textTertiary}
-                                value={testDate}
-                                onChangeText={setTestDate}
-                            />
-                        </View>
+                        <DatePickerInput
+                            label="检测日期"
+                            value={testDate}
+                            onChange={setTestDate}
+                            required
+                        />
 
                         <View style={styles.inputGroup}>
                             <Text style={styles.inputLabel}>检测机构</Text>

@@ -34,7 +34,7 @@ function MainTabs({ userId, userNickname, onLogout, navigation }) {
           switch (route.name) {
             case '首页': iconName = focused ? 'home' : 'home-outline'; break;
             case 'PSA': iconName = focused ? 'analytics' : 'analytics-outline'; break;
-            case '治疗': iconName = focused ? 'medical' : 'medical-outline'; break;
+            case '诊疗': iconName = focused ? 'medical' : 'medical-outline'; break;
             case '报告': iconName = focused ? 'document-text' : 'document-text-outline'; break;
             case '我的': iconName = focused ? 'person' : 'person-outline'; break;
           }
@@ -68,7 +68,7 @@ function MainTabs({ userId, userNickname, onLogout, navigation }) {
       <Tab.Screen name="PSA">
         {() => <PsaScreen userId={userId} />}
       </Tab.Screen>
-      <Tab.Screen name="治疗">
+      <Tab.Screen name="诊疗">
         {() => <InjectionScreen userId={userId} />}
       </Tab.Screen>
       <Tab.Screen name="报告">

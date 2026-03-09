@@ -150,9 +150,9 @@ export default function HomeScreen({ navigation: parentNavigation, userId, userN
                         onPress={() => parentNavigation.navigate('Testosterone')}
                     />
                     <QuickAction
-                        icon="medical" label="注射记录"
+                        icon="medical" label="诊疗记录"
                         color={Colors.moduleInjection} bgColor={Colors.moduleInjection + '10'}
-                        onPress={() => tabNavigation.navigate('治疗')}
+                        onPress={() => tabNavigation.navigate('诊疗')}
                     />
                     <QuickAction
                         icon="images" label="影像记录"
@@ -190,7 +190,7 @@ export default function HomeScreen({ navigation: parentNavigation, userId, userN
                         <Text style={styles.sectionTitle}>治疗信息</Text>
                         <TouchableOpacity
                             style={styles.treatmentCard}
-                            onPress={() => tabNavigation.navigate('治疗')}
+                            onPress={() => tabNavigation.navigate('诊疗')}
                             activeOpacity={0.7}
                         >
                             <View style={styles.treatmentHeader}>
