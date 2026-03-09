@@ -96,7 +96,7 @@ export default function ProfileScreen({ userId, onLogout }) {
                         onPress={() => Alert.alert('数据安全', '您的所有数据都安全地存储在手机本地，不会上传到任何服务器。卸载应用会删除所有数据，建议定期导出报告备份。')}
                     />
                     <MenuItem icon="information-circle-outline" label="关于应用" color="#3B82F6"
-                        onPress={() => Alert.alert('关于', '前列腺癌随访助手 v1.0.0\n\n专业的前列腺癌随访管理工具，帮助患者更好地管理疾病，提高生活质量。\n\n⚠️ 免责声明：本应用提供的信息和分析仅供参考，不构成医学诊断或治疗建议。任何医疗决策请咨询专业医生。')}
+                        onPress={() => Alert.alert('关于', '前列腺癌随访助手 v1.0.2\n\n专业的前列腺癌随访管理工具，帮助患者更好地管理疾病，提高生活质量。\n\n⚠️ 免责声明：本应用提供的信息和分析仅供参考，不构成医学诊断或治疗建议。任何医疗决策请咨询专业医生。')}
                     />
                     <MenuItem icon="help-circle-outline" label="使用帮助" color="#8B5CF6"
                         onPress={() => Alert.alert('使用帮助', '1. 首页可以查看健康概况和预警\n2. 各模块可以录入检查数据\n3. 长按记录可以删除\n4. 综合报告可导出 PDF 分享给医生\n5. 系统会自动计算 PSADT 和预警')}
@@ -109,7 +109,7 @@ export default function ProfileScreen({ userId, onLogout }) {
                     />
                 </View>
 
-                <Text style={styles.version}>前列腺癌随访助手 v1.0.0</Text>
+                <Text style={styles.version}>前列腺癌随访助手 v1.0.2</Text>
                 <View style={{ height: 30 }} />
             </ScrollView>
         </View>
