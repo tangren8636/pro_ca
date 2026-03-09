@@ -4,12 +4,13 @@ import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '../theme';
 import { getDashboardData, getPsaRecords, getTestosteroneRecords, checkBiochemicalRecurrence, checkCastrationResistance } from '../database';
 import { formatDateCN, daysFromNow } from '../utils/dateUtils';
 
-export default function HomeScreen({ navigation, userId, userNickname }) {
+export default function HomeScreen({ navigation: parentNavigation, userId, userNickname }) {
+    const tabNavigation = useNavigation();
     const [data, setData] = useState(null);
     const [alerts, setAlerts] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
@@ -103,7 +104,7 @@ export default function HomeScreen({ navigation, userId, userNickname }) {
                         <Text style={styles.greeting}>你好，{userNickname || '用户'} 👋</Text>
                         <Text style={styles.subtitle}>今天感觉怎么样？</Text>
                     </View>
-                    <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Profile')}>
+                    <TouchableOpacity style={styles.avatarButton} onPress={() => tabNavigation.navigate('我的')}>
                         <Ionicons name="person-circle" size={44} color={Colors.primary} />
                     </TouchableOpacity>
                 </View>
@@ -141,22 +142,22 @@ export default function HomeScreen({ navigation, userId, userNickname }) {
                     <QuickAction
                         icon="analytics" label="记录PSA"
                         color={Colors.modulePSA} bgColor={Colors.modulePSA + '10'}
-                        onPress={() => navigation.navigate('PSA')}
+                        onPress={() => tabNavigation.navigate('PSA')}
                     />
                     <QuickAction
                         icon="fitness" label="记录睾酮"
                         color={Colors.moduleTestosterone} bgColor={Colors.moduleTestosterone + '10'}
-                        onPress={() => navigation.navigate('Testosterone')}
+                        onPress={() => parentNavigation.navigate('Testosterone')}
                     />
                     <QuickAction
                         icon="medical" label="注射记录"
                         color={Colors.moduleInjection} bgColor={Colors.moduleInjection + '10'}
-                        onPress={() => navigation.navigate('Injection')}
+                        onPress={() => tabNavigation.navigate('治疗')}
                     />
                     <QuickAction
                         icon="images" label="影像记录"
                         color={Colors.moduleImaging} bgColor={Colors.moduleImaging + '10'}
-                        onPress={() => navigation.navigate('Imaging')}
+                        onPress={() => parentNavigation.navigate('Imaging')}
                     />
                 </View>
 
@@ -170,7 +171,7 @@ export default function HomeScreen({ navigation, userId, userNickname }) {
                         subtitle={data?.latestPsa ? formatDateCN(data.latestPsa.test_date) : null}
                         icon="analytics"
                         color={Colors.modulePSA}
-                        onPress={() => navigation.navigate('PSA')}
+                        onPress={() => tabNavigation.navigate('PSA')}
                     />
                     <DataCard
                         title="睾酮"
@@ -179,7 +180,7 @@ export default function HomeScreen({ navigation, userId, userNickname }) {
                         subtitle={data?.latestTestosterone ? formatDateCN(data.latestTestosterone.test_date) : null}
                         icon="fitness"
                         color={Colors.moduleTestosterone}
-                        onPress={() => navigation.navigate('Testosterone')}
+                        onPress={() => parentNavigation.navigate('Testosterone')}
                     />
                 </View>
 
@@ -189,7 +190,7 @@ export default function HomeScreen({ navigation, userId, userNickname }) {
                         <Text style={styles.sectionTitle}>治疗信息</Text>
                         <TouchableOpacity
                             style={styles.treatmentCard}
-                            onPress={() => navigation.navigate('Injection')}
+                            onPress={() => tabNavigation.navigate('治疗')}
                             activeOpacity={0.7}
                         >
                             <View style={styles.treatmentHeader}>
